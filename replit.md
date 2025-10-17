@@ -60,10 +60,23 @@ The application runs on port 5000 with both frontend and backend on the same ser
 - `/` - Home page
 - `/api/health` - API health check
 
+## Storage System
+- **Local File Storage**: Simple abstraction layer in `server/lib/storage.ts`
+- **Functions**:
+  - `saveFile(buffer, originalName)` - Save files with UUID-based naming
+  - `getFilePath(id, ext)` - Retrieve file paths by ID
+- **Storage Location**: `server/storage/raw/` (gitignored)
+- **Easy Migration**: Designed for simple swap to S3/cloud storage later
+- **Documentation**: See `server/lib/README.md` for details
+
 ## Recent Changes
+- October 17, 2025: Added file storage abstraction layer
+  - Created storage module with saveFile and getFilePath functions
+  - Added uuid package for unique file identifiers
+  - Created documentation and examples
 - October 16, 2025: Initial project setup with blank template
-- Created basic welcome page with theme support
-- Added health check API endpoint
+  - Created basic welcome page with theme support
+  - Added health check API endpoint
 
 ## Next Steps
 This is a blank template ready for your custom features:
