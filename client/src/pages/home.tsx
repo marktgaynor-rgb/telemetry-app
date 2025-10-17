@@ -20,7 +20,7 @@ useEffect(() => {
             <div className="p-4 bg-primary rounded-lg">
               <Activity className="h-12 w-12 text-primary-foreground" />
             </div>
-            <h1 className="text-4xl font-semibold text-foreground">Telemetry App</h1>
+            <h1 className="text-4xl font-semibold text-foreground">Telemetry App - Dev</h1>
           </div>
             <p className="text-green-500 font-mono mt-2">
             Backend status: {apiText}
