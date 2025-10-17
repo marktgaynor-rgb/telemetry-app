@@ -11,6 +11,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // 👇 Add this block
+  app.get("/api/sessions", (_req, res) => {
+    res.json(demoSessions);
+  });
+  
   const httpServer = createServer(app);
 
   return httpServer;
