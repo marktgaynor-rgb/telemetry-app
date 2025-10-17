@@ -1,5 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import uploadRouter from "./routes/upload";
+import { db } from "./db/memory";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Health check endpoint
@@ -11,10 +13,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // 👇 Add this block
+  // Sessions list endpoint
   app.get("/api/sessions", (_req, res) => {
-    res.json(demoSessions);
+    res.json(db.sessions);
   });
+
+  // Upload routes
+  app.use("/api", uploadRouter);
   
   const httpServer = createServer(app);
 

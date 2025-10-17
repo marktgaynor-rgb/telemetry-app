@@ -1,7 +1,7 @@
 # Telemetry App
 
 ## Overview
-A blank Node.js fullstack application with a clean, professional foundation. Built with Express backend and React frontend, ready for custom feature implementation.
+A telemetry data management web application for racing simulators. Handles file uploads from iRacing and AiM sources, stores them locally with an abstraction layer for future cloud migration, and manages session metadata including track, vehicle, and parsing status.
 
 ## Tech Stack
 
@@ -16,7 +16,9 @@ A blank Node.js fullstack application with a clean, professional foundation. Bui
 ### Backend
 - **Express.js** server
 - **TypeScript** for type safety
-- **In-memory storage** (MemStorage) ready for database integration
+- **In-memory database** for session management
+- **Multer** for multipart file uploads
+- **UUID** for unique identifiers
 
 ## Project Structure
 
@@ -28,19 +30,27 @@ client/
 │   ├── lib/            # Utilities and configurations
 │   └── App.tsx         # Main app component
 server/
-├── routes.ts           # API endpoints
-├── storage.ts          # Data storage interface
+├── routes/
+│   └── upload.ts       # File upload endpoints
+├── db/
+│   └── memory.ts       # In-memory session database
+├── lib/
+│   └── storage.ts      # File storage abstraction
+├── routes.ts           # Main API routes registration
 └── index.ts            # Server entry point
 shared/
 └── schema.ts           # Shared TypeScript types
 ```
 
 ## Current Features
-- ✅ Clean landing page with welcome message
+- ✅ File upload endpoint with multipart/form-data support
+- ✅ Support for iRacing and AiM telemetry sources
+- ✅ Session metadata tracking (track, vehicle, timestamps)
+- ✅ Local file storage with cloud-ready abstraction
+- ✅ In-memory session database
+- ✅ Health check API endpoint (`/api/health`)
 - ✅ Dark/Light theme toggle
 - ✅ Responsive design
-- ✅ Professional UI components
-- ✅ Health check API endpoint (`/api/health`)
 
 ## Design System
 - **Primary Font**: Inter (400, 500, 600, 700 weights)
@@ -56,20 +66,42 @@ shared/
 
 The application runs on port 5000 with both frontend and backend on the same server.
 
-### Available Routes
-- `/` - Home page
-- `/api/health` - API health check
+### Available API Routes
+- `GET /api/health` - API health check
+- `GET /api/sessions` - List all uploaded sessions
+- `POST /api/upload` - Upload telemetry file (multipart/form-data)
+  - Fields: `source` (iracing|aim), `track` (optional), `vehicle` (optional), `file` (binary)
 
 ## Storage System
 - **Local File Storage**: Simple abstraction layer in `server/lib/storage.ts`
 - **Functions**:
-  - `saveFile(buffer, originalName)` - Save files with UUID-based naming
+  - `saveFile(buffer, originalName)` - Save files with UUID-based naming, returns `{id, uri, path}`
   - `getFilePath(id, ext)` - Retrieve file paths by ID
 - **Storage Location**: `server/storage/raw/` (gitignored)
 - **Easy Migration**: Designed for simple swap to S3/cloud storage later
 - **Documentation**: See `server/lib/README.md` for details
 
+## Session Database
+- **In-memory Storage**: `server/db/memory.ts`
+- **Session Schema**:
+  - `id` - Unique session identifier (UUID)
+  - `source` - Data source: 'iracing' | 'aim'
+  - `track` - Track name (optional)
+  - `vehicle` - Vehicle name (optional)
+  - `createdAt` - ISO timestamp
+  - `parsed` - Boolean flag for processing status
+  - `fileUri` - Storage URI (e.g., `local://storage/raw/...`)
+  - `filePath` - Absolute filesystem path
+
 ## Recent Changes
+- October 17, 2025: Implemented file upload system
+  - Created upload router with multer integration (`server/routes/upload.ts`)
+  - Implemented in-memory session database (`server/db/memory.ts`)
+  - Added session list endpoint (`GET /api/sessions`)
+  - Added file upload endpoint (`POST /api/upload`)
+  - Installed multer and @types/multer packages
+  - File type validation for .csv, .ibt, .txt files
+  - 100 MB file size limit
 - October 17, 2025: Added file storage abstraction layer
   - Created storage module with saveFile and getFilePath functions
   - Added uuid package for unique file identifiers
@@ -79,8 +111,8 @@ The application runs on port 5000 with both frontend and backend on the same ser
   - Added health check API endpoint
 
 ## Next Steps
-This is a blank template ready for your custom features:
-- Add your data models in `shared/schema.ts`
-- Implement API endpoints in `server/routes.ts`
-- Build UI components in `client/src/components/`
-- Create new pages in `client/src/pages/`
+- Build frontend upload UI component
+- Implement telemetry file parsers (iRacing .ibt, AiM .csv)
+- Create session list/detail pages
+- Add data visualization for telemetry data
+- Implement search and filtering for sessions
