@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import uploadRouter from "./routes/upload";
+import uploadRouter from "./routes.upload";
 import { db } from "./db/memory";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -19,7 +19,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Upload routes
-  app.use("/api", uploadRouter);
+  app.use(uploadRouter);
   
   const httpServer = createServer(app);
 

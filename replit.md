@@ -30,12 +30,11 @@ client/
 │   ├── lib/            # Utilities and configurations
 │   └── App.tsx         # Main app component
 server/
-├── routes/
-│   └── upload.ts       # File upload endpoints
 ├── db/
 │   └── memory.ts       # In-memory session database
 ├── lib/
 │   └── storage.ts      # File storage abstraction
+├── routes.upload.ts    # File upload endpoints
 ├── routes.ts           # Main API routes registration
 └── index.ts            # Server entry point
 shared/
@@ -95,13 +94,14 @@ The application runs on port 5000 with both frontend and backend on the same ser
 
 ## Recent Changes
 - October 17, 2025: Implemented file upload system
-  - Created upload router with multer integration (`server/routes/upload.ts`)
+  - Created upload router with multer integration (`server/routes.upload.ts`)
   - Implemented in-memory session database (`server/db/memory.ts`)
   - Added session list endpoint (`GET /api/sessions`)
   - Added file upload endpoint (`POST /api/upload`)
   - Installed multer and @types/multer packages
   - File type validation for .csv, .ibt, .txt files
   - 100 MB file size limit
+  - Tested end-to-end: file upload → storage → database tracking
 - October 17, 2025: Added file storage abstraction layer
   - Created storage module with saveFile and getFilePath functions
   - Added uuid package for unique file identifiers

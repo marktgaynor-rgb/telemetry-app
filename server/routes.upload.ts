@@ -1,10 +1,10 @@
-// server/routes/upload.ts
+// server/routes.upload.ts
 import { Router } from 'express';
 import multer from 'multer';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import { saveFile } from '../lib/storage';
-import { db, SessionRow } from '../db/memory';
+import { saveFile } from './lib/storage';
+import { db, SessionRow } from './db/memory';
 
 const router = Router();
 
@@ -22,7 +22,7 @@ const upload = multer({
 
 // POST /api/upload  (multipart/form-data)
 // fields: source ("iracing" | "aim"), track (string), vehicle (string), file (binary)
-router.post('/upload', upload.single('file'), async (req, res) => {
+router.post('/api/upload', upload.single('file'), async (req, res) => {
   try {
     // Basic validation
     const source = (req.body?.source || '').toLowerCase();
