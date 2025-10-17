@@ -3,11 +3,12 @@ import type { Express } from "express";
 import express from "express";
 import { createServer, type Server } from "http";
 import path from "path";
+import fs from "fs";
 import uploadRouter from "./routes.upload";
 import { db } from "./db/memory";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Health
+  // Health check
   app.get("/api/health", (_req, res) => {
     res.json({
       status: "ok",
@@ -16,30 +17,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Uploads
+  // Upload endpoints
   app.use(uploadRouter);
 
-  // Sessions list (A1.3 sneak peek – keep if you already added db)
+  // A1.3: Sessions list
   app.get("/api/sessions", (_req, res) => {
-    const list = db.sessions?.map(s => ({
-      id: s.id,
-      source: s.source,
-      track: s.track,
-      vehicle: s.vehicle,
-      createdAt: s.createdAt,
-      parsed: s.parsed,
-    })) ?? [];
+    const list =
+      db.sessions?.map((s) => ({
+        id: s.id,
+        source: s.source,
+        track: s.track,
+        vehicle: s.vehicle,
+        createdAt: s.createdAt,
+        parsed: s.parsed,
+      })) ?? [];
     res.json(list);
   });
 
-  // 🔽 Serve the built frontend from root /dist (monorepo output)
-  const clientPath = path.resolve(process.cwd(), "dist");
+  // 🔽 Auto-detect and serve the built frontend
+  const candidates = [
+    path.resolve(process.cwd(), "dist"),
+    path.resolve(process.cwd(), "client/dist"),
+  ];
+
+  const clientPath =
+    candidates.find((p) => fs.existsSync(path.join(p, "index.html"))) ??
+    candidates[0];
+
+  console.log("[frontend] serving from:", clientPath);
+
   app.use(express.static(clientPath));
   app.get("*", (req, res) => {
     if (req.path.startsWith("/api")) {
       return res.status(404).json({ error: "API route not found" });
     }
-    res.sendFile(path.join(clientPath, "index.html"));
+    const indexFile = path.join(clientPath, "index.html");
+    if (!fs.existsSync(indexFile)) {
+      console.error("[frontend] index.html missing at:", indexFile);
+      return res
+        .status(500)
+        .json({ message: `index.html not found at ${indexFile}` });
+    }
+    res.sendFile(indexFile);
   });
 
   const httpServer = createServer(app);
