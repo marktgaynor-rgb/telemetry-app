@@ -3,13 +3,11 @@ import type { Express } from "express";
 import express from "express";
 import { createServer, type Server } from "http";
 import path from "path";
-import { fileURLToPath } from "url";
-
-import uploadRouter from "./routes.upload";      // ← the upload route from A1.2
-import { db } from "./db/memory";                // ← in-memory “DB” of sessions
+import uploadRouter from "./routes.upload";
+import { db } from "./db/memory";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Health check
+  // Health
   app.get("/api/health", (_req, res) => {
     res.json({
       status: "ok",
@@ -18,26 +16,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Upload endpoints (/api/upload)
+  // Uploads
   app.use(uploadRouter);
 
-  // A1.3: List sessions
+  // Sessions list (A1.3 sneak peek – keep if you already added db)
   app.get("/api/sessions", (_req, res) => {
-    const list = db.sessions.map((s) => ({
+    const list = db.sessions?.map(s => ({
       id: s.id,
       source: s.source,
       track: s.track,
       vehicle: s.vehicle,
       createdAt: s.createdAt,
       parsed: s.parsed,
-    }));
+    })) ?? [];
     res.json(list);
   });
 
-  // Serve the built React app for non-API routes
-  const __dirname = path.dirname(fileURLToPath(import.meta.url));
-  const clientPath = path.resolve(__dirname, "../client/dist");
-
+  // 🔽 Serve the built frontend from root /dist (monorepo output)
+  const clientPath = path.resolve(process.cwd(), "dist");
   app.use(express.static(clientPath));
   app.get("*", (req, res) => {
     if (req.path.startsWith("/api")) {
