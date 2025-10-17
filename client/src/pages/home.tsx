@@ -1,7 +1,17 @@
 import { Activity } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const [apiText, setApiText] = useState("Checking...");
+
+useEffect(() => {
+  fetch("/api/health")
+    .then((r) => r.json())
+    .then((d) => setApiText(d.message))
+    .catch(() => setApiText("Failed to reach API"));
+}, []);
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-6 py-12">
@@ -12,7 +22,9 @@ export default function Home() {
             </div>
             <h1 className="text-4xl font-semibold text-foreground">Telemetry App</h1>
           </div>
-          
+            <p className="text-green-500 font-mono mt-2">
+            Backend status: {apiText}
+          </p>
           <p className="text-lg text-muted-foreground text-center max-w-2xl">
             A professional monitoring and analytics platform ready for your custom implementation
           </p>
