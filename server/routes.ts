@@ -16,10 +16,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // ✅ Upload endpoints
+  // ✅ Upload routes
   app.use(uploadRouter);
 
-  // ✅ A1.3: Sessions list endpoint
+  // ✅ Sessions list (A1.3)
   app.get("/api/sessions", (_req, res) => {
     const list =
       db.sessions?.map((s) => ({
@@ -33,13 +33,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(list);
   });
 
-  // ✅ Serve the built frontend directly from client/dist
-  const clientPath = path.resolve(process.cwd(), "client/dist");
+  // ✅ Serve frontend from dist/public (this is your build output)
+  const clientPath = path.resolve(process.cwd(), "dist/public");
   console.log("[frontend] serving from:", clientPath);
 
   app.use(express.static(clientPath));
 
-  // Fallback: send index.html for all non-API routes
   app.get("*", (req, res) => {
     if (req.path.startsWith("/api")) {
       return res.status(404).json({ error: "API route not found" });
